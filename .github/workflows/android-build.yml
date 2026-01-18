@@ -14,15 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Fix line endings for gradlew
-      run: |
-        # 确保 gradlew 有执行权限
-        chmod +x ./gradlew
-        # 转换行尾格式为 Unix (LF)
-        sed -i 's/\r$//' ./gradlew
-        # 检查文件格式
-        file ./gradlew
-        
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -32,12 +23,33 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
       
+    - name: Setup Gradle wrapper
+      run: |
+        # 确保 gradlew 有正确的权限
+        chmod +x ./gradlew
+        # 验证 gradlew 文件格式
+        head -5 ./gradlew
+        
+    - name: Validate Gradle wrapper
+      run: |
+        # 检查 gradle-wrapper.properties 是否存在
+        if [ -f "gradle/wrapper/gradle-wrapper.properties" ]; then
+          echo "✓ gradle-wrapper.properties exists"
+          cat gradle/wrapper/gradle-wrapper.properties
+        else
+          echo "✗ gradle-wrapper.properties missing"
+          exit 1
+        fi
+        
     - name: Build debug APK
-      run: ./gradlew assembleDebug
-      
+      run: |
+        # 使用更详细的日志
+        ./gradlew tasks --all || true
+        ./gradlew assembleDebug --stacktrace
+        
     - name: Build release APK
       run: |
-        ./gradlew assembleRelease
+        ./gradlew assembleRelease --stacktrace
         
     - name: Upload APK artifacts
       uses: actions/upload-artifact@v4
