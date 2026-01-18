@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.example.beijingtime'
-    compileSdk 34
+    compileSdk 33  // 从 34 改为 33 以避免警告
 
     defaultConfig {
         applicationId "com.example.beijingtime"
         minSdk 24
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -23,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
