@@ -23,39 +23,22 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
       
-    - name: Setup Gradle wrapper
+    - name: Download Gradle
       run: |
-        # 确保 gradlew 有正确的权限
-        chmod +x ./gradlew
-        # 验证 gradlew 文件格式
-        head -5 ./gradlew
+        # 下载并解压 Gradle
+        wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
+        unzip -q gradle-8.0-bin.zip
+        echo "GRADLE_HOME=$PWD/gradle-8.0" >> $GITHUB_ENV
+        echo "$PWD/gradle-8.0/bin" >> $GITHUB_PATH
         
-    - name: Validate Gradle wrapper
+    - name: Build with Gradle
       run: |
-        # 检查 gradle-wrapper.properties 是否存在
-        if [ -f "gradle/wrapper/gradle-wrapper.properties" ]; then
-          echo "✓ gradle-wrapper.properties exists"
-          cat gradle/wrapper/gradle-wrapper.properties
-        else
-          echo "✗ gradle-wrapper.properties missing"
-          exit 1
-        fi
+        # 使用下载的 Gradle
+        gradle assembleDebug --stacktrace
         
-    - name: Build debug APK
-      run: |
-        # 使用更详细的日志
-        ./gradlew tasks --all || true
-        ./gradlew assembleDebug --stacktrace
-        
-    - name: Build release APK
-      run: |
-        ./gradlew assembleRelease --stacktrace
-        
-    - name: Upload APK artifacts
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: app-apk
-        path: |
-          app/build/outputs/apk/debug/app-debug.apk
-          app/build/outputs/apk/release/app-release-unsigned.apk
+        name: app-debug-apk
+        path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 7
