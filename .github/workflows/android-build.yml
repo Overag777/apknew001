@@ -22,23 +22,35 @@ jobs:
         
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
+      with:
+        api-level: 33  # 指定 API 级别
+        build-tools-version: 33.0.1
+        ndk-version: 25.1.8937393
+        cmake-version: 3.22.1
       
-    - name: Download Gradle
+    - name: Download and setup Gradle
       run: |
-        # 下载并解压 Gradle
+        # 下载 Gradle
         wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
         unzip -q gradle-8.0-bin.zip
         echo "GRADLE_HOME=$PWD/gradle-8.0" >> $GITHUB_ENV
         echo "$PWD/gradle-8.0/bin" >> $GITHUB_PATH
+        # 验证 Gradle
+        gradle --version
         
-    - name: Build with Gradle
+    - name: Build debug APK
       run: |
-        # 使用下载的 Gradle
-        gradle assembleDebug --stacktrace
+        gradle assembleDebug --stacktrace --no-daemon
         
-    - name: Upload APK artifact
+    - name: Build release APK
+      run: |
+        gradle assembleRelease --stacktrace --no-daemon
+        
+    - name: Upload APK artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: app-apk
+        path: |
+          app/build/outputs/apk/debug/app-debug.apk
+          app/build/outputs/apk/release/app-release-unsigned.apk
         retention-days: 7
