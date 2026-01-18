@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!--
+    Backup rules are ignored on devices running Android 11 (API level 30) and above
+    if android:allowBackup="false" is set
+    -->
+    <exclude domain="sharedpref" path="."/>
+</full-backup-content>
